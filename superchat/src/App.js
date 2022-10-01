@@ -1,10 +1,25 @@
 import "./App.css";
 
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore/lite";
-import { getAuth } from "firebase/auth";
+import {
+  getFirestore,
+  collection,
+  orderBy,
+  limit,
+  query,
+  onSnapshot,
+  doc,
+  getDocs,
+} from "firebase/firestore";
+import {
+  getAuth,
+  onAuthStageChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
+import { useEffect } from "react";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA6Ru0mlhOrEJyIdBZ5UF1OlZAFd3kqdqc",
@@ -16,9 +31,16 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
-const firestore = getFirestore(app);
+const db = getFirestore(app);
+
+async function loadMessages() {
+  const colRef = collection(db, "messages");
+  const docsSnap = await getDocs(colRef);
+  docsSnap.forEach((message) => {
+    <ChatMessage key={message.id} message={message}></ChatMessage>;
+  });
+}
 
 function App() {
   const [user] = useAuthState(auth);
@@ -32,8 +54,8 @@ function App() {
 
 function SignIn() {
   const signInWithGoogle = () => {
-    const provider = new auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider);
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider);
   };
   return <button onClick={signInWithGoogle}>Sign in with Google</button>;
 }
@@ -51,17 +73,9 @@ function SignOut() {
 }
 
 function ChatRoom() {
-  const messageRef = firestore.collection("messages");
-  const query = messageRef.orderBy("createdAt").limit(25);
-  const [messages] = useCollection(query, { idField: "id" });
   return (
     <>
-      <div>
-        {messages &&
-          messages.map((message) => (
-            <ChatMessage key={message.id} message={message}></ChatMessage>
-          ))}
-      </div>
+      <div>{loadMessages()}</div>
     </>
   );
 }
