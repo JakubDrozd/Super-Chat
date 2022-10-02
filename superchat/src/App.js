@@ -1,46 +1,23 @@
 import "./App.css";
 
-import { initializeApp } from "firebase/app";
-import {
-  getFirestore,
-  collection,
-  orderBy,
-  limit,
-  query,
-  onSnapshot,
-  doc,
-  getDocs,
-} from "firebase/firestore";
-import {
-  getAuth,
-  onAuthStageChanged,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { useCollection } from "react-firebase-hooks/firestore";
-import { useEffect } from "react";
+import firebase from "firebase/compat/app";
+import "firebase/compat/firestore";
+import "firebase/compat/auth";
 
-const firebaseConfig = {
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+
+firebase.initializeApp({
   apiKey: "AIzaSyA6Ru0mlhOrEJyIdBZ5UF1OlZAFd3kqdqc",
   authDomain: "super-chat-331c3.firebaseapp.com",
   projectId: "super-chat-331c3",
   storageBucket: "super-chat-331c3.appspot.com",
   messagingSenderId: "402521353323",
   appId: "1:402521353323:web:c0c6a6c891725d6fa8952e",
-};
+});
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-async function loadMessages() {
-  const colRef = collection(db, "messages");
-  const docsSnap = await getDocs(colRef);
-  docsSnap.forEach((message) => {
-    <ChatMessage key={message.id} message={message}></ChatMessage>;
-  });
-}
+const auth = firebase.auth();
+const firestore = firebase.firestore();
 
 function App() {
   const [user] = useAuthState(auth);
@@ -54,8 +31,8 @@ function App() {
 
 function SignIn() {
   const signInWithGoogle = () => {
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider);
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider);
   };
   return <button onClick={signInWithGoogle}>Sign in with Google</button>;
 }
@@ -73,9 +50,18 @@ function SignOut() {
 }
 
 function ChatRoom() {
+  const messagesRef = firestore.collection("messages");
+  const query = messagesRef.orderBy("createdAt").limit(25);
+  const [messages] = useCollectionData(query, { idField: "id" });
+
   return (
     <>
-      <div>{loadMessages()}</div>
+      <div>
+        {messages &&
+          messages.map((msg) => {
+            return <ChatMessage key={msg.id} message={msg}></ChatMessage>;
+          })}
+      </div>
     </>
   );
 }
