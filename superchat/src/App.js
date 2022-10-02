@@ -24,7 +24,12 @@ function App() {
   const [user] = useAuthState(auth);
   return (
     <div className="App">
-      <header></header>
+      <header>
+        <h1>
+          <img src={require("./img/avatar.png")} alt="logo" />
+        </h1>
+        <SignOut></SignOut>
+      </header>
       <section>{user ? <ChatRoom></ChatRoom> : <SignIn></SignIn>}</section>
     </div>
   );
@@ -45,7 +50,9 @@ function SignOut() {
         onClick={() => {
           auth.signOut();
         }}
-      ></button>
+      >
+        Sign Out
+      </button>
     )
   );
 }
