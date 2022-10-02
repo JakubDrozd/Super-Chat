@@ -3,6 +3,7 @@ import "./App.css";
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import "firebase/compat/auth";
+import { useState } from "react";
 
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollectionData } from "react-firebase-hooks/firestore";
@@ -53,17 +54,32 @@ function ChatRoom() {
   const messagesRef = firestore.collection("messages");
   const query = messagesRef.orderBy("createdAt").limit(25);
   const [messages] = useCollectionData(query, { idField: "id" });
-
+  const [formValue, setFormValue] = useState("");
+  const key = 1;
+  const sendMessage = async (e) => {
+    e.preventDefault();
+    const { uid, photoURL } = auth.currentUser;
+    await messagesRef.add({
+      text: formValue,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  };
   return (
     <>
       <div>
         {messages &&
           messages.map((msg) => (
-            <ChatMessage key={msg.id} message={msg}></ChatMessage>
+            <ChatMessage
+              key={key === 1 ? key : key + 1}
+              message={msg}
+            ></ChatMessage>
           ))}
       </div>
-      <form>
-        <input type="text" />
+      <form onSubmit={sendMessage}>
+        <input
+          value={formValue}
+          onChange={(e) => setFormValue(e.target.value)}
+        />
         <button type="submit">Send</button>
       </form>
     </>
