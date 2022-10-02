@@ -3,7 +3,7 @@ import "./App.css";
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import "firebase/compat/auth";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollectionData } from "react-firebase-hooks/firestore";
@@ -58,15 +58,23 @@ function ChatRoom() {
   const key = 1;
   const sendMessage = async (e) => {
     e.preventDefault();
+    if (formValue === " " || formValue === "") {
+      return null;
+    }
     const { uid, photoURL } = auth.currentUser;
     await messagesRef.add({
       text: formValue,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      uid,
+      photoURL,
     });
+    setFormValue("");
+    dummy.current.scrollIntoView({ behavior: "smooth" });
   };
+  const dummy = useRef();
   return (
     <>
-      <div>
+      <main>
         {messages &&
           messages.map((msg) => (
             <ChatMessage
@@ -74,7 +82,8 @@ function ChatRoom() {
               message={msg}
             ></ChatMessage>
           ))}
-      </div>
+        <div ref={dummy}></div>
+      </main>
       <form onSubmit={sendMessage}>
         <input
           value={formValue}
