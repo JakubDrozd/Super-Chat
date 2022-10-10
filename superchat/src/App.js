@@ -20,6 +20,7 @@ firebase.initializeApp({
 const auth = firebase.auth();
 const firestore = firebase.firestore();
 
+// Main page
 function App() {
   const [user] = useAuthState(auth);
   return (
