@@ -7,7 +7,7 @@ body {
   max-width: 728px;
   margin: 0 auto;
 }
-
+/* App header styling */
 .App header {
   background-color: #181717;
   height: 10vh;
@@ -24,6 +24,8 @@ body {
   padding: 10px;
   box-sizing: border-box;
 }
+
+/* App section styling */
 
 .App section {
   display: flex;
