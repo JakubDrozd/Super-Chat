@@ -31,7 +31,8 @@ function App() {
         </h1>
         <SignOut></SignOut>
       </header>
-      <section>{user ? <ChatRoom></ChatRoom> : <SignIn></SignIn>}</section>
+      {/* Show either chatRoom or Sign in window depending on whether user is signed in or not */}
+      <section>{user ? <ChatRoom></ChatRoom> : <SignIn></SignIn>}</ section>
     </div>
   );
 }
